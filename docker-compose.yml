@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: production
+      REDIS_URL: redis://redis:6379/0
+      PLAYWRIGHT_SERVER_URL: ws://browser:3000/
+      API_KEY_HASHES: ${API_KEY_HASHES:-}
+      DEV_API_KEYS: ${DEV_API_KEYS:-changeme-dev-key}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
+      FREE_PROXY_LIST: ${FREE_PROXY_LIST:-}
+      REQUEST_RATE_LIMIT: ${REQUEST_RATE_LIMIT:-5/minute}
+    depends_on:
+      - redis
+      - browser
+
+  browser:
+    image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    command: ["npx", "playwright", "run-server", "--host", "0.0.0.0", "--port", "3000"]
+    ports:
+      - "3000:3000"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
