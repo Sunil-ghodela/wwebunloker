@@ -23,3 +23,9 @@ env/
 
 # Docker / data
 redis-data/
+
+# Railway agent tooling (local)
+.agents/
+
+# Node / Railway SDK
+node_modules/
